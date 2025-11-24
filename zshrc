@@ -1,26 +1,23 @@
-HISTFILE=~/.histfile
-HISTSIZE=1000
-SAVEHIST=1000
-COLORTERM=yes
-REPORTTIME=10 # print elapsed time when more than 10 seconds
+export HISTFILE=~/.histfile
+export HISTSIZE=1000
+export SAVEHIST=1000
+export COLORTERM=yes
 
-EDITOR=vim
-PAGER=less
-RSYNC_RSH=/usr/bin/ssh
-FIGNORE='.o:.out:~'
-DISPLAY=:0.0
+export EDITOR=vim
+export PAGER=less
+export RSYNC_RSH=/usr/bin/ssh
+export FIGNORE='.o:.out:~'
+# DISPLAY=:0.0
 
 # output colored grep
-GREP_COLOR='7;31'
+export GREP_COLOR='7;31'
 
-LS_COLORS='no=0:fi=0:di=1;34:ln=1;36:pi=40;33:so=1;35:do=1;35:bd=40;33;1:cd=40;33;1:or=40;31;1:ex=1;32:*.tar=1;31:*.tgz=1;31:*.arj=1;31:*.taz=1;31:*.lzh=1;31:*.zip=1;31:*.rar=1;31:*.z=1;31:*.Z=1;31:*.gz=1;31:*.bz2=1;31:*.tbz2=1;31:*.deb=1;31:*.pdf=1;31:*.jpg=1;35:*.jpeg=1;35:*.gif=1;35:*.bmp=1;35:*.pbm=1;35:*.pgm=1;35:*.ppm=1;35:*.pnm=1;35:*.tga=1;35:*.xbm=1;35:*.xpm=1;35:*.tif=1;35:*.tiff=1;35:*.png=1;35:*.mpg=1;35:*.mpeg=1;35:*.mov=1;35:*.avi=1;35:*.wmv=1;35:*.ogg=1;35:*.mp3=1;35:*.mpc=1;35:*.wav=1;35:*.au=1;35:*.swp=1;30:*.pl=36:*.c=36:*.cc=36:*.h=36:*.core=1;33;41:*.gpg=1;33:'
-ZLS_COLORS="$LS_COLORS"
+export LS_COLORS='no=0:fi=0:di=1;34:ln=1;36:pi=40;33:so=1;35:do=1;35:bd=40;33;1:cd=40;33;1:or=40;31;1:ex=1;32:*.tar=1;31:*.tgz=1;31:*.arj=1;31:*.taz=1;31:*.lzh=1;31:*.zip=1;31:*.rar=1;31:*.z=1;31:*.Z=1;31:*.gz=1;31:*.bz2=1;31:*.tbz2=1;31:*.deb=1;31:*.pdf=1;31:*.jpg=1;35:*.jpeg=1;35:*.gif=1;35:*.bmp=1;35:*.pbm=1;35:*.pgm=1;35:*.ppm=1;35:*.pnm=1;35:*.tga=1;35:*.xbm=1;35:*.xpm=1;35:*.tif=1;35:*.tiff=1;35:*.png=1;35:*.mpg=1;35:*.mpeg=1;35:*.mov=1;35:*.avi=1;35:*.wmv=1;35:*.ogg=1;35:*.mp3=1;35:*.mpc=1;35:*.wav=1;35:*.au=1;35:*.swp=1;30:*.pl=36:*.c=36:*.cc=36:*.h=36:*.core=1;33;41:*.gpg=1;33:'
+export ZLS_COLORS="$LS_COLORS"
 
-export GREP_COLOR GREP_OPTIONS TERM EDITOR PAGER
-export RSYNC_RSH CVSROOT FIGNORE DISPLAY NNTPSERVER COLORTERM
-export HISTFILE HISTSIZE SAVEHIST REPORTTIME LS_COLORS ZLS_COLORS
 export PYTHONSTARTUP=$HOME/.pythonrc
 
+unsetopt BEEP
 # Allow functions in prompt
 setopt prompt_subst
 # Make cd push the old directory onto the directory stack.
@@ -54,32 +51,44 @@ setopt RC_QUOTES
 setopt HIST_VERIFY
 
 bindkey -v
-bindkey -M viins 'zz' vi-cmd-mode
+# bindkey -M viins 'zz' vi-cmd-mode
 bindkey "^P" history-beginning-search-backward
 bindkey "^N" history-beginning-search-forward
 
 . /etc/zsh_command_not_found
 
-fpath=(~/.zsh.d/functions $fpath)
+# fpath=(~/.zsh.d/functions $fpath)
 
-autoload unlock
-autoload lock
-autoload activate
 autoload -U bashcompinit; bashcompinit
 autoload -U colors; colors
 autoload -U compinit; compinit
 autoload -U promptinit; promptinit
+autoload -Uz vcs_info
 
-prompt pure
+precmd() {
+  vcs_info
+}
+
+zstyle ':vcs_info:*' enable git
+
+# Formats: include %{sha} where you want it
+zstyle ':vcs_info:git:*' formats '%F{magenta}{%b%u%c}%f'
+zstyle ':vcs_info:git:*' actionformats '%F{red}{%b|%a}%f'
+
+# Prompt: first line shows path + vcs info; second line has `| ` for typing
+PROMPT='%F{green}%~%f${vcs_info_msg_0_}
+| '
+
+unset RPROMPT
 
 zstyle :compinstall filename $HOME/.zshrc
 
-alias ls='ls --color=always'
+alias ls='ls --color=always --group-directories-first'
 alias ll='LANG=C ls -o --group-directories-first'
 alias grep='grep --color=auto'
 alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
-alias g=git
+alias g='git'
 alias gs='git st'
 alias gd='git diff'
 alias commit='git ci'
@@ -91,6 +100,7 @@ alias vs='vagrant status'
 alias vr='vagrant run'
 alias vtest='vagrant run test'
 alias mv='mv -i'
+alias pstat='cd $HOME/work/git/PolicyStat'
 
 if [[ "$TERM" == screen* ]]; then
     function preexec {
@@ -98,31 +108,18 @@ if [[ "$TERM" == screen* ]]; then
       echo -ne "\ek$title\e\\"
     }
 else
-    detached=$(screen -ls | grep Detached | cut -f2)
+    detached=$(screen -ls | grep terminal | grep Detached | cut -f2)
     if [ -n "$detached" ]; then
         screen -r "$detached"
     else
-        screen
+        screen -S terminal
     fi
 fi
 
-export PYENV_ROOT="${HOME}/.pyenv"
-if [ -d "${PYENV_ROOT}" ]; then
-  export PATH="${PYENV_ROOT}/bin:${PATH}"
-  eval "$(pyenv init -)"
-fi
-
-_nosecomplete()
-{
-  cur="${COMP_WORDS[COMP_CWORD]}"
-  COMPREPLY=($($(which nosecomplete) ${cur}))
-}
-setopt complete_aliases
-complete -o nospace -F _nosecomplete vtest
-
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-
-### Added by the Heroku Toolbelt
-export PATH="/usr/local/heroku/bin:$PATH"
-
 eval "$(direnv hook zsh)"
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+. "$HOME/.local/bin/env"

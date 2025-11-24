@@ -5,8 +5,9 @@ map <Leader><TAB> :CtrlP<CR>
 map <Leader>p :b#<CR>
 map <F1> <ESC>
 
-set novb
-set noeb
+set belloff=all
+"set novb
+"set noeb
 " let g:ackprg='ack-grep -H --nocolor --nogroup --column'
 
 let g:syntastic_enable_signs = 1
@@ -25,7 +26,7 @@ let g:buffergator_sort_regime='mru'
 let g:ctags_statusline=1
 let g:ctags_title=1
 
-let g:ctrlp_user_command = [ '.git', 'cd %s && git ls-files . -co --exclude-standard', 'find %s -type f' ]
+" let g:ctrlp_user_command = [ '.git', 'cd %s && git ls-files . -co --exclude-standard', 'find %s -type f' ]
 
 set showcmd
 
@@ -59,3 +60,11 @@ au BufRead *.txt setlocal ft=
 " set statusline+=%#warningmsg#
 " set statusline+=%{SyntasticStatuslineFlag()}
 " set statusline+=%*
+"
+"
+
+" Open a new Cpilot Chat window
+nnoremap <leader>cc :CopilotChatOpen<CR>
+
+" Add visual selection to copilot window
+vmap <leader>a <Plug>CopilotChatAddSelection
