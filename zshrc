@@ -55,7 +55,7 @@ bindkey -v
 bindkey "^P" history-beginning-search-backward
 bindkey "^N" history-beginning-search-forward
 
-. /etc/zsh_command_not_found
+test -f /etc/zsh_command_not_found && source /etc/zsh_command_not_found
 
 # fpath=(~/.zsh.d/functions $fpath)
 
@@ -83,11 +83,29 @@ unset RPROMPT
 
 zstyle :compinstall filename $HOME/.zshrc
 
-alias ls='ls --color=always --group-directories-first'
-alias ll='LANG=C ls -o --group-directories-first'
-alias grep='grep --color=auto'
-alias fgrep='fgrep --color=auto'
-alias egrep='egrep --color=auto'
+# Prefer GNU coreutils/grep if installed, otherwise fall back to BSD versions
+
+if command -v gls >/dev/null 2>&1; then
+  # Homebrew coreutils (gls) – Linux-like behavior
+  alias ls='gls --color=always --group-directories-first'
+  alias ll='LANG=C gls -o --group-directories-first'
+else
+  # macOS/BSD ls – best-effort color
+  alias ls='ls -G'
+  alias ll='ls -lG'
+fi
+
+if command -v ggrep >/dev/null 2>&1; then
+  alias grep='ggrep --color=auto'
+  alias fgrep='gfgrep --color=auto'
+  alias egrep='gegrep --color=auto'
+else
+  # No color flags on BSD grep; leave them plain to avoid errors
+  alias grep='grep'
+  alias fgrep='fgrep'
+  alias egrep='egrep'
+fi
+
 alias g='git'
 alias gs='git st'
 alias gd='git diff'
@@ -100,7 +118,12 @@ alias vs='vagrant status'
 alias vr='vagrant run'
 alias vtest='vagrant run test'
 alias mv='mv -i'
-alias pstat='cd $HOME/work/git/PolicyStat'
+
+if [ -d "$HOME/work/git/PolicyStat" ]; then
+    alias pstat='cd $HOME/work/git/PolicyStat'
+else
+    alias pstat='cd $HOME/git/PolicyStat'
+fi
 
 if [[ "$TERM" == screen* ]]; then
     function preexec {
@@ -116,10 +139,15 @@ else
     fi
 fi
 
-eval "$(direnv hook zsh)"
+if command -v direnv >/dev/null 2>&1; then
+  eval "$(direnv hook zsh)"
+fi
 
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
-. "$HOME/.local/bin/env"
+if [ -d "$HOME/.nvm" ]; then
+  export NVM_DIR="$HOME/.nvm"
+  source "$NVM_DIR/nvm.sh" # This loads nvm
+  source "$NVM_DIR/bash_completion" # This loads nvm bash_completion
+fi
+
+test -s "$HOME/.local/bin/env" && source "$HOME/.local/bin/env"
