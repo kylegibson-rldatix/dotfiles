@@ -75,9 +75,9 @@ zstyle ':vcs_info:*' enable git
 zstyle ':vcs_info:git:*' formats '%F{magenta}{%b%u%c}%f'
 zstyle ':vcs_info:git:*' actionformats '%F{red}{%b|%a}%f'
 
-# Prompt: first line shows path + vcs info; second line has `| ` for typing
+# Prompt: first line shows path + vcs info; second line has `$ ` for typing
 PROMPT='%F{green}%~%f${vcs_info_msg_0_}
-| '
+$ '
 
 unset RPROMPT
 
