@@ -125,7 +125,10 @@ else
     alias pstat='cd $HOME/git/PolicyStat'
 fi
 
-if [[ "$TERM" == screen* ]]; then
+if [[ "$VSCODE_INJECTION" == 1 ]]; then
+    # Don't do anything special in VS Code's integrated terminal
+    :
+elif [[ "$TERM" == screen* ]]; then
     function preexec {
       title=$(echo $1 | cut -c1-20)
       echo -ne "\ek$title\e\\"
