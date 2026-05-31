@@ -154,3 +154,7 @@ if [ -d "$HOME/.nvm" ]; then
 fi
 
 test -s "$HOME/.local/bin/env" && source "$HOME/.local/bin/env"
+
+if [ -d "$HOME/bin" ]; then
+  export PATH="$HOME/bin:$PATH"
+fi
