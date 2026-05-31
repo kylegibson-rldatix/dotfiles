@@ -44,6 +44,7 @@ nmap ; :
 
 if has('gui_running')
     color tir_black
+    set guifont=Menlo\ Regular:h18
 else
     set background=dark
 endif

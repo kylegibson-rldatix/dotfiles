@@ -1,6 +1,6 @@
 [user]
   name = Kyle Gibson
-  email = kyle.gibson@frozenonline.com
+  email = kgibson@rldatix.com
 [color]
   ui = auto
 [color "branch"]
@@ -50,5 +50,3 @@
   auto = 1
 [pull]
   ff = only
-[includeIf "gitdir:~/work/git/"]
-    path = ~/work/git/.gitconfig
